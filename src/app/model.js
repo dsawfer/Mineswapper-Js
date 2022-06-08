@@ -10,7 +10,7 @@ export class Model {
     this._y = 0;
 
     this._isGameNotStarted = true;
-    this._currentLevel = 1;
+    this._currentLevel = 0;
   }
 
   get boardData() {

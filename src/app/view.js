@@ -2,6 +2,11 @@ export class View {
   constructor() {
     this.boardElement = document.querySelector(".board");
     this.minesScoreElement = document.querySelector(".mines-score");
+    this.controlsElement = document.querySelector(".controls");
+    // this.minesInfoElement = document.querySelector(".mines-info");
+    this.gameInfoElement = document.querySelector(".game-info");
+    this.gameStatusElement = document.querySelector(".game-status");
+    this.newGameButton = document.querySelector(".new-game");
 
     this.clickCallback;
     this.contextmenuCallback;
@@ -70,5 +75,19 @@ export class View {
         );
       });
     });
+  }
+
+  gameOver(status) {
+    this.controlsElement.classList.remove("game-start");
+    this.controlsElement.classList.add("game-end");
+    this.newGameButton.textContent = 'Next Level';
+    this.gameStatusElement.textContent = status;
+  }
+
+  gameStart(status) {
+    this.controlsElement.classList.add("game-start");
+    this.controlsElement.classList.remove("game-end");
+    this.newGameButton.textContent = 'New Game';
+    this.gameStatusElement.textContent = status;
   }
 }

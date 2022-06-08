@@ -15,7 +15,10 @@ export class Controller {
     this.newGameButton = document.querySelector(".new-game");
     this.newGameButton.addEventListener("click", () => {
       this.model.isGameNotStarted = true;
-      this.generateBoard(this.model.currentLevel);
+      this.model.currentLevel = 0;
+      this.newGameButton.textContent = "New Game";
+      this.generateBoard(this.model.currentLevelConfig);
+      this.model.gameStart();
     });
   }
 
@@ -171,10 +174,13 @@ export class Controller {
     const lose = this.checkLose();
 
     if (win) {
-      console.info("win");
+      // console.info("Win");
+      this.model.gameOver("Win");
+      this.model.currentLevel = this.model.currentLevel + 1;
     }
     if (lose) {
-      console.info("lose");
+      // console.info("lose");
+      this.model.gameOver("Lose");
       this.model.boardData.forEach((row) => {
         row.forEach((tile) => {
           if (tile.status === TILE_STATUSES.MARKED) this.markTile(tile);

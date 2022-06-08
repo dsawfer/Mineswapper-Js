@@ -76,6 +76,14 @@ body {
   background-image: url(../images/svg/info.svg);
 }
 
+.game-start .game-info {
+  display: none;
+}
+
+.game-end .mines-info {
+  display: none;
+}
+
 .mines-score {
   min-width: 60px;
 }
@@ -86,7 +94,7 @@ body {
 
 .new-game {
   cursor: pointer;
-  font-weight: normal;
+  /* font-weight: normal; */
 }
 
 .skills {

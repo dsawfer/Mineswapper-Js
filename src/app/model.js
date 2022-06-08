@@ -6,10 +6,11 @@ export class Model {
 
     this._board = [];
     this._minesScore = 0;
-    this._x = 0;
-    this._y = 0;
+    this._sizeX = 0;
+    this._sizey = 0;
 
     this._isGameNotStarted = true;
+    this._isGameOver = false;
     this._currentLevel = 0;
   }
 
@@ -24,14 +25,14 @@ export class Model {
 
   get boardSizes() {
     return {
-      x: this._x,
-      y: this._y,
+      x: this._sizeX,
+      y: this._sizeY,
     };
   }
 
   set boardSizes({ x, y }) {
-    this._x = x;
-    this._y = y;
+    this._sizeX = x;
+    this._sizeY = y;
   }
 
   get minesScore() {
@@ -44,11 +45,15 @@ export class Model {
   }
 
   get currentLevel() {
-    return GAME_LEVELS[this._currentLevel];
+    return this._currentLevel;
   }
 
   set currentLevel(currentLevel) {
     this._currentLevel = currentLevel;
+  }
+
+  get currentLevelConfig() {
+    return GAME_LEVELS[this._currentLevel];
   }
 
   get isGameNotStarted() {
@@ -57,5 +62,19 @@ export class Model {
 
   set isGameNotStarted(gameStatus) {
     this._isGameNotStarted = gameStatus;
+  }
+
+  get isGameOver() {
+    return this._isGameOver;
+  }
+
+  gameOver(status) {
+    this._isGameOver = true;
+    this._view.gameOver(status);
+  }
+
+  gameStart(status) {
+    this._isGameOver = false;
+    this._view.gameStart(status);
   }
 }

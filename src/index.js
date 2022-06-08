@@ -9,5 +9,4 @@ const model = new Model(view);
 // create controller
 const controller = new Controller(model);
 
-
-controller.generateBoard(model.currentLevel);
+controller.generateBoard(model.currentLevelConfig);

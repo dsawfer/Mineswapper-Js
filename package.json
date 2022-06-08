@@ -12,6 +12,5 @@
         "live-server": "^1.1.0"
     },
     "dependencies": {
-        "normalize.css": "^8.0.1"
     }
 }

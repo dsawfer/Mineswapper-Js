@@ -1,8 +1,4 @@
-const GAME_LEVELS = [
-  [5, 5],
-  [10, 10],
-  [15, 15],
-];
+import { GAME_LEVELS } from "../helpers/constants.js";
 
 export class Model {
   constructor(view) {

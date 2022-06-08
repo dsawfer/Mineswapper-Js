@@ -1,22 +1,9 @@
-const TILE_STATUSES = {
-  HIDDEN: "hidden",
-  MINE: "mine",
-  NUMBER: "number",
-  MARKED: "marked",
-};
+import {
+  TILE_STATUSES,
+  TILE_COLORS,
+  BOMB_PERCENTAGE,
+} from "../helpers/constants.js";
 
-const TILE_COLORS = [
-  "#0081F9",
-  "#18A718",
-  "#E9060B",
-  "#1A1BB8",
-  "#941919",
-  "#D651C0",
-  "#1C850B",
-  "#EB9026",
-];
-
-const BOMB_PERCENTAGE = 14;
 const SVG_PATH = "src/images/svg/";
 
 let bombsCount = 0;

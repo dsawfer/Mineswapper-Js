@@ -9,7 +9,8 @@ body {
 
   font-family: "Roboto", serif;
   font-style: normal;
-  line-height: 16pt;
+  line-height: 40px;
+  font-size: 16pt;
   font-weight: bold;
 }
 
@@ -71,7 +72,8 @@ body {
   color: white;
   font-size: 28pt;
 
-  background-image: url(../images/svg/info.svg);
+  background-color: #c3c3c3;
+  /* background-image: url(../images/svg/info.svg); */
 }
 
 .mines-score {

@@ -7,11 +7,6 @@ export class View {
     this.gameInfoElement = document.querySelector(".game-info");
     this.gameStatusElement = document.querySelector(".game-status");
     this.newGameButton = document.querySelector(".new-game");
-
-    this.clickCallback;
-    this.contextmenuCallback;
-    this.mousedownCallback;
-    this.mouseupCallback;
   }
 
   set minesScoreView(bombsCount) {
@@ -29,14 +24,14 @@ export class View {
 
         tile.element.addEventListener(
           "click",
-          (this.clickCallback = () => {
+          (tile.clickCallback = () => {
             controller.revealTile(tile);
             controller.checkGameEnd();
           })
         );
         tile.element.addEventListener(
           "contextmenu",
-          (this.contextmenuCallback = (e) => {
+          (tile.contextmenuCallback = (e) => {
             e.preventDefault();
             controller.markTile(tile);
             controller.checkGameEnd();
@@ -77,17 +72,27 @@ export class View {
     });
   }
 
-  gameOver(status) {
+  gameOver(status, board) {
     this.controlsElement.classList.remove("game-start");
     this.controlsElement.classList.add("game-end");
-    this.newGameButton.textContent = 'Next Level';
+    this.newGameButton.textContent = "Next Level";
     this.gameStatusElement.textContent = status;
+
+    board.forEach((row) => {
+      row.forEach((tile) => {
+        tile.element.removeEventListener("click", tile.clickCallback);
+        tile.element.removeEventListener(
+          "contextmenu",
+          tile.contextmenuCallback
+        );
+      });
+    });
   }
 
   gameStart(status) {
     this.controlsElement.classList.add("game-start");
     this.controlsElement.classList.remove("game-end");
-    this.newGameButton.textContent = 'New Game';
+    this.newGameButton.textContent = "New Game";
     this.gameStatusElement.textContent = status;
   }
 }

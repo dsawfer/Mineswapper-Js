@@ -37,6 +37,8 @@ export class Controller {
           x: i,
           y: j,
           mine: false,
+          clickCallback: undefined,
+          contextmenuCallback: undefined,
           get status() {
             return this.element.dataset.status;
           },

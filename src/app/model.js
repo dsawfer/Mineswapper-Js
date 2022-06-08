@@ -70,7 +70,7 @@ export class Model {
 
   gameOver(status) {
     this._isGameOver = true;
-    this._view.gameOver(status);
+    this._view.gameOver(status, this._board);
   }
 
   gameStart(status) {

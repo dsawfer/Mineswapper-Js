@@ -7,6 +7,18 @@ export class View {
     this.gameInfoElement = document.querySelector(".game-info");
     this.gameStatusElement = document.querySelector(".game-status");
     this.newGameButton = document.querySelector(".new-game");
+
+    this.modalElement = document.querySelector(".modal");
+    this.openModalButtonElement = document.getElementById("open-button");
+    this.closeModalButtonElement = document.getElementById("close-button");
+
+    this.openModalButtonElement.onclick = () => {
+      this.modalElement.style.display = "block";
+    };
+
+    this.closeModalButtonElement.onclick = () => {
+      this.modalElement.style.display = "none";
+    };
   }
 
   set minesScoreView(bombsCount) {

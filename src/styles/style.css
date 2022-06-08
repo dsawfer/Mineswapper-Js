@@ -14,6 +14,59 @@ body {
   font-weight: bold;
 }
 
+.slide {
+  position: absolute;
+  right: 1%;
+  top: 1%;
+
+  cursor: pointer;
+}
+
+.slide:hover {
+  /* background-color: #6e6e6e; */
+}
+
+.reverse {
+  transform: scale(-1, 1);
+}
+
+.modal {
+  display: none;
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  right: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
+
+  animation-name: animateslide;
+  animation-duration: 0.4s;
+}
+
+@keyframes animateslide {
+  from {
+    /* right: -600px; */
+    opacity: 0;
+  }
+  to {
+    /* right: 0; */
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  height: 100%;
+  /* margin: 15% auto; 15% from the top and centered */
+  padding: 20px;
+  background-image: url(/src/images/rules.png);
+  background-repeat: no-repeat;
+  /* border: 1px solid #888; */
+  /* width: 80%; Could be more or less, depending on screen size */
+}
+
 .content {
   /* max-width: 50%; */
   display: flex;

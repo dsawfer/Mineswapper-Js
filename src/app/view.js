@@ -1,12 +1,14 @@
+import { SKILL_NAMES } from "../helpers/constants.js";
+
 export class View {
   constructor() {
     this.boardElement = document.querySelector(".board");
     this.minesScoreElement = document.querySelector(".mines-score");
     this.controlsElement = document.querySelector(".controls");
-    // this.minesInfoElement = document.querySelector(".mines-info");
+
     this.gameInfoElement = document.querySelector(".game-info");
     this.gameStatusElement = document.querySelector(".game-status");
-    this.newGameButton = document.querySelector(".new-game");
+    this.newGameButtonElement = document.querySelector(".new-game");
 
     this.modalElement = document.querySelector(".modal");
     this.openModalButtonElement = document.getElementById("open-button");
@@ -40,8 +42,6 @@ export class View {
       row.forEach((tile) => {
         this.boardElement.append(tile.element);
 
-        let holder = false;
-
         tile.element.addEventListener(
           "click",
           (tile.clickCallback = () => {
@@ -57,23 +57,6 @@ export class View {
             controller.checkGameEnd();
           })
         );
-
-        // tile.element.addEventListener(
-        //   "mousedown",
-        //   (this.mousedownCallback = () => {
-        //     holder = setTimeout(function () {
-        //       controller.markTile(tile);
-        //       controller.checkGameEnd();
-        //       holder = true;
-        //     }, 1000);
-        //   })
-        // );
-        // tile.element.addEventListener(
-        //   "mouseup",
-        //   (this.mouseupCallback = () => {
-        //     if (holder !== true) clearTimeout(holder);
-        //   })
-        // );
       });
     });
     this.boardElement.style.setProperty("--sizeX", boardSizeX);
@@ -98,15 +81,15 @@ export class View {
     this.gameStatusElement.textContent = status;
 
     if (status === "lose") {
-      this.newGameButton.textContent = "New Game";
+      this.newGameButtonElement.textContent = "New Game";
       this.gameStatusElement.textContent = "Lose";
     } else {
-      this.newGameButton.textContent = "Next Level";
+      this.newGameButtonElement.textContent = "Next Level";
       this.gameStatusElement.textContent = "Win";
     }
 
     if (status === "ended") {
-      this.newGameButton.textContent = "New Game";
+      this.newGameButtonElement.textContent = "New Game";
       this.gameStatusElement.textContent = "Game Over";
     }
 
@@ -124,12 +107,20 @@ export class View {
   gameStart() {
     this.controlsElement.classList.add("game-start");
     this.controlsElement.classList.remove("game-end");
-    this.newGameButton.textContent = "New Game";
+    this.newGameButtonElement.textContent = "New Game";
   }
 
-  addSkill(skill) {
+  highlightSkills(...skills) {
+    for (const skill of skills) {
+      let skillElement = document.getElementById(SKILL_NAMES[skill]);
+      skillElement.classList.add("highlight");
+    }
   }
 
-  removeSkill(skill) {
+  removeHighlight() {
+    for (const skill of SKILL_NAMES) {
+      let skillElement = document.getElementById(skill);
+      skillElement.classList.remove("highlight");
+    }
   }
 }

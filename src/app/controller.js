@@ -11,8 +11,9 @@ const SVG_PATH = "src/images/svg/";
 let bombsCount = 0;
 
 export class Controller {
-  constructor(model) {
+  constructor(model, view) {
     this.model = model;
+    this.view = view;
 
     this.newGameButton = document.querySelector(".new-game");
     this.newGameButton.addEventListener("click", () => {
@@ -157,22 +158,6 @@ export class Controller {
     }
   }
 
-  chooseSkill() {
-    let first = -1;
-    let second = -1;
-    let third = -1;
-
-    first = Math.round(Math.random() * NUMBER_OF_SKILLS);
-    while (second === -1 || second === first) {
-      second = Math.round(Math.random() * NUMBER_OF_SKILLS);
-    }
-    while (third === -1 || third === first || third === second) {
-      third = Math.round(Math.random() * NUMBER_OF_SKILLS);
-    }
-
-    // console.info(first, second, third);
-  }
-
   checkWin() {
     return this.model.boardData.every((row) => {
       return row.every((tile) => {
@@ -200,7 +185,7 @@ export class Controller {
 
     if (win) {
       // console.info("Win");
-      chooseSkill();
+      this.model.chooseSkill();
       this.model.gameOver("win");
     }
     if (lose) {

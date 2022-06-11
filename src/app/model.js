@@ -1,5 +1,24 @@
 import { GAME_LEVELS } from "../helpers/constants.js";
 
+class User {
+  constructor() {
+    this.skills = new Map();
+    this.skills.set('scan', 1);
+    this.skills.set('probe', 0);
+    this.skills.set('heal-points', 1);
+    this.skills.set('explode', 0);
+    this.skills.set('show-wrong', 0);
+  }
+
+  addSkill(key) {
+    this.skills.set('key', this.skills.get(key) + 1);
+  }
+
+  deleteSkill(key) {
+    this.skills.set('key', this.skills.get(key) - 1);
+  }
+}
+
 export class Model {
   constructor(view) {
     this._view = view;
@@ -9,9 +28,9 @@ export class Model {
     this._sizeX = 0;
     this._sizey = 0;
 
-    this._isGameNotStarted = true;
-    this._isGameOver = false;
     this._currentLevel = 0;
+
+    this._gameStatus = "not-started"; // not-started, started, win, lose, ended
   }
 
   get boardData() {
@@ -56,25 +75,24 @@ export class Model {
     return GAME_LEVELS[this._currentLevel];
   }
 
-  get isGameNotStarted() {
-    return this._isGameNotStarted;
+  get gameStatus() {
+    return this._gameStatus;
   }
 
-  set isGameNotStarted(gameStatus) {
-    this._isGameNotStarted = gameStatus;
-  }
-
-  get isGameOver() {
-    return this._isGameOver;
+  set gameStatus(status) {
+    this._gameStatus = status;
   }
 
   gameOver(status) {
-    this._isGameOver = true;
+    if (this._currentLevel === this.GAME_LEVELS.length - 1) {
+      this._gameStatus = "ended";
+    } else this._gameStatus = status;
+
     this._view.gameOver(status, this._board);
   }
 
-  gameStart(status) {
-    this._isGameOver = false;
-    this._view.gameStart(status);
+  gameStart() {
+    this._gameStatus = "not-started";
+    this._view.gameStart();
   }
 }

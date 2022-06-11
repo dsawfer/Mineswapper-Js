@@ -87,8 +87,20 @@ export class View {
   gameOver(status, board) {
     this.controlsElement.classList.remove("game-start");
     this.controlsElement.classList.add("game-end");
-    this.newGameButton.textContent = "Next Level";
     this.gameStatusElement.textContent = status;
+
+    if (status === "lose") {
+      this.newGameButton.textContent = "New Game";
+      this.gameStatusElement.textContent = "Lose";
+    } else {
+      this.newGameButton.textContent = "Next Level";
+      this.gameStatusElement.textContent = "Win";
+    }
+
+    if (status === "ended") {
+      this.newGameButton.textContent = "New Game";
+      this.gameStatusElement.textContent = "Game Over";
+    }
 
     board.forEach((row) => {
       row.forEach((tile) => {
@@ -101,10 +113,10 @@ export class View {
     });
   }
 
-  gameStart(status) {
+  gameStart() {
     this.controlsElement.classList.add("game-start");
     this.controlsElement.classList.remove("game-end");
     this.newGameButton.textContent = "New Game";
-    this.gameStatusElement.textContent = status;
+    // this.gameStatusElement.textContent = status;
   }
 }

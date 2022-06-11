@@ -14,11 +14,18 @@ export class Controller {
 
     this.newGameButton = document.querySelector(".new-game");
     this.newGameButton.addEventListener("click", () => {
-      this.model.isGameNotStarted = true;
-      this.model.currentLevel = 0;
+      // this.model.isGameNotStarted = true;
       this.newGameButton.textContent = "New Game";
-      this.generateBoard(this.model.currentLevelConfig);
+
+      if (this.model.gameStatus === "win") {
+        this.model.currentLevel += 1;
+      } else {
+        this.model.currentLevel = 0;
+      }
+
+      // this.model.gameStatus = "not-started";
       this.model.gameStart();
+      this.generateBoard(this.model.currentLevelConfig);
     });
   }
 
@@ -134,9 +141,9 @@ export class Controller {
       return;
     }
 
-    if (this.model.isGameNotStarted) {
+    if (this.model.gameStatus === "not-started") {
       this.generateMines(tile);
-      this.model.isGameNotStarted = false;
+      this.model.gameStatus = "started";
     }
 
     tile.status = TILE_STATUSES.NUMBER;
@@ -171,18 +178,17 @@ export class Controller {
   }
 
   checkGameEnd() {
-    if (this.model.isGameNotStarted) return;
+    if (this.model.gameStatus === "not-started") return;
     const win = this.checkWin();
     const lose = this.checkLose();
 
     if (win) {
-      // console.info("Win");
-      this.model.gameOver("Win");
-      this.model.currentLevel = this.model.currentLevel + 1;
+      // console.info("Win");;
+      this.model.gameOver("win");
     }
     if (lose) {
       // console.info("lose");
-      this.model.gameOver("Lose");
+      this.model.gameOver("lose");
       this.model.boardData.forEach((row) => {
         row.forEach((tile) => {
           if (tile.status === TILE_STATUSES.MARKED) this.markTile(tile);

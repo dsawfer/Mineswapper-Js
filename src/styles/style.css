@@ -61,7 +61,7 @@ body {
   height: 100%;
   /* margin: 15% auto; 15% from the top and centered */
   padding: 20px;
-  background-image: url(/src/images/rules.png);
+  /* background-image: url(/src/images/rules.png); */
   background-repeat: no-repeat;
   /* border: 1px solid #888; */
   /* width: 80%; Could be more or less, depending on screen size */

@@ -12,6 +12,14 @@ export class View {
     this.openModalButtonElement = document.getElementById("open-button");
     this.closeModalButtonElement = document.getElementById("close-button");
 
+    // this.firstSkillElement = document.querySelector(".scan");
+    // this.secondSkillElement = document.querySelector(".probe");
+    // this.thirdSkillElement = document.querySelector(".heal-points");
+    // this.fourthSkillElement = document.querySelector(".explode");
+    // this.fifthSkillElement = document.querySelector(".show-wrong");
+
+    // this.skillsElement = document.querySelector(".skills");
+
     this.openModalButtonElement.onclick = () => {
       this.modalElement.style.display = "block";
     };
@@ -117,6 +125,11 @@ export class View {
     this.controlsElement.classList.add("game-start");
     this.controlsElement.classList.remove("game-end");
     this.newGameButton.textContent = "New Game";
-    // this.gameStatusElement.textContent = status;
+  }
+
+  addSkill(skill) {
+  }
+
+  removeSkill(skill) {
   }
 }

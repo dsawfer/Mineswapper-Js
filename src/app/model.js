@@ -3,25 +3,39 @@ import { GAME_LEVELS } from "../helpers/constants.js";
 class User {
   constructor() {
     this.skills = new Map();
-    this.skills.set('scan', 1);
-    this.skills.set('probe', 0);
-    this.skills.set('heal-points', 1);
-    this.skills.set('explode', 0);
-    this.skills.set('show-wrong', 0);
+    this.skills.set("scan", 1);
+    this.skills.set("probe", 0);
+    this.skills.set("heal-points", 1);
+    this.skills.set("explode", 0);
+    this.skills.set("show-wrong", 0);
+
+    this.skillsElement = document.querySelector(".skills");
+    this.skillsElement.onclick = (event) => {
+      if (event.target.classList.contains("highlight")) {
+        this.addSkill(event.target.id);
+      }
+    };
   }
 
   addSkill(key) {
-    this.skills.set('key', this.skills.get(key) + 1);
+    this.skills.set(key, this.skills.get(key) + 1);
+    let skillElement = document.querySelector(`.${key}`);
+    let amountNumberElement = skillElement.querySelector(".amount-number");
+    amountNumberElement.textContent = this.skills.get(key);
   }
 
-  deleteSkill(key) {
-    this.skills.set('key', this.skills.get(key) - 1);
+  removeSkill(key) {
+    this.skills.set(key, this.skills.get(key) - 1);
+    let skillElement = document.querySelector(`.${key}`);
+    let amountNumberElement = skillElement.querySelector(".amount-number");
+    amountNumberElement.textContent = this.skills.get(key);
   }
 }
 
 export class Model {
   constructor(view) {
     this._view = view;
+    this._user = new User();
 
     this._board = [];
     this._minesScore = 0;
@@ -84,7 +98,7 @@ export class Model {
   }
 
   gameOver(status) {
-    if (this._currentLevel === this.GAME_LEVELS.length - 1) {
+    if (this._currentLevel === GAME_LEVELS.length - 1) {
       this._gameStatus = "ended";
     } else this._gameStatus = status;
 

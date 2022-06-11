@@ -12,6 +12,14 @@ export const TILE_STATUSES = {
   MARKED: "marked",
 };
 
+export const SKILL_NAMES = [
+  "scan",
+  "probe",
+  "heal-points",
+  "explode",
+  "show-wrong",
+];
+
 export const TILE_COLORS = [
   "#0081F9",
   "#18A718",
@@ -24,3 +32,4 @@ export const TILE_COLORS = [
 ];
 
 export const BOMB_PERCENTAGE = 14;
+export const NUMBER_OF_SKILLS = 4;

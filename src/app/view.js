@@ -14,14 +14,6 @@ export class View {
     this.openModalButtonElement = document.getElementById("open-button");
     this.closeModalButtonElement = document.getElementById("close-button");
 
-    // this.firstSkillElement = document.querySelector(".scan");
-    // this.secondSkillElement = document.querySelector(".probe");
-    // this.thirdSkillElement = document.querySelector(".heal-points");
-    // this.fourthSkillElement = document.querySelector(".explode");
-    // this.fifthSkillElement = document.querySelector(".show-wrong");
-
-    // this.skillsElement = document.querySelector(".skills");
-
     this.openModalButtonElement.onclick = () => {
       this.modalElement.style.display = "block";
     };
@@ -61,18 +53,6 @@ export class View {
     });
     this.boardElement.style.setProperty("--sizeX", boardSizeX);
     this.boardElement.style.setProperty("--sizeY", boardSizeY);
-  }
-
-  clearBoard(board) {
-    board.forEach((row) => {
-      row.forEach((tile) => {
-        tile.element.removeEventListener("click", this.clickCallback);
-        tile.element.removeEventListener(
-          "contextmenu",
-          this.contextmenuCallback
-        );
-      });
-    });
   }
 
   gameOver(status, board) {
@@ -124,7 +104,28 @@ export class View {
     }
   }
 
+  setSkillAmount(skill, amount) {
+    let skillElement = document.querySelector(`.${skill}`);
+    let amountNumberElement = skillElement.querySelector(".amount-number");
+    amountNumberElement.textContent = amount;
+  }
+
   selectSkill(skill) {
-    console.info(skill);
+    let skillElement = document.getElementById(skill);
+    skillElement.classList.add("selected");
+    // console.info(skill);
+  }
+
+  unselectSkill(skill) {
+    let skillElement = document.getElementById(skill);
+    skillElement.classList.remove("selected");
+  }
+
+  resetSkills(skillsData) {
+    for (const skill of SKILL_NAMES) {
+      let skillElement = document.querySelector(`.${skill}`);
+      let amountNumberElement = skillElement.querySelector(".amount-number");
+      amountNumberElement.textContent = skillsData.get(skill);
+    }
   }
 }

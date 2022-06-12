@@ -156,6 +156,12 @@ body {
   cursor: pointer;
 }
 
+.selected {
+  border: 4px solid;
+  border-color: blueviolet;
+  cursor: pointer;
+}
+
 .skills {
   display: flex;
   justify-content: space-between;

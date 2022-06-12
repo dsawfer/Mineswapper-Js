@@ -11,9 +11,8 @@ const SVG_PATH = "src/images/svg/";
 let bombsCount = 0;
 
 export class Controller {
-  constructor(model, view) {
+  constructor(model) {
     this.model = model;
-    this.view = view;
 
     this.newGameButton = document.querySelector(".new-game");
     this.newGameButton.addEventListener("click", () => {
@@ -23,20 +22,48 @@ export class Controller {
         this.model.currentLevel += 1;
       } else {
         this.model.currentLevel = 0;
+        this.model.resetSkills();
       }
 
       this.model.gameStart();
       this.generateBoard(this.model.getGameConfig("current-level-config"));
     });
+
+    this.skillsElement = document.querySelector(".skills");
+    this.skillsElement.onclick = (event) => {
+      if (event.target.classList.contains("highlight")) {
+        this.model.addSkill(event.target.id);
+        // this._view.removeHighlight();
+      } else {
+        if (
+          event.target.id === "heal-points" ||
+          this.model.getSkill(event.target.id) < 1 ||
+          this.model.getGameConfig("game-status") !== "started"
+        )
+          return;
+
+        switch (event.target.id) {
+          case "explode":
+            this.useSkill(null, "explode");
+            break;
+          case "show-wrong":
+            this.useSkill(null, "show-wrong");
+            break;
+          default:
+            this.model.selectSkill(event.target.id);
+            break;
+        }
+      }
+    };
   }
 
   generateBoard([x, y]) {
     const board = [];
     bombsCount = Math.trunc(((x * y) / 100) * BOMB_PERCENTAGE);
 
-    for (let i = 0; i < x; i++) {
+    for (let i = 0; i < y; i++) {
       const row = [];
-      for (let j = 0; j < y; j++) {
+      for (let j = 0; j < x; j++) {
         const element = document.createElement("div");
         element.dataset.status = TILE_STATUSES.HIDDEN;
         element.style.backgroundImage = `url(${SVG_PATH}${TILE_STATUSES.HIDDEN}.svg)`;
@@ -74,8 +101,8 @@ export class Controller {
   fillBoard(positions) {
     const { x, y } = this.model.getBoardConfig("board-sizes");
     const boardData = this.model.getBoardConfig("board-data");
-    for (let i = 0; i < x; i++) {
-      for (let j = 0; j < y; j++) {
+    for (let i = 0; i < y; i++) {
+      for (let j = 0; j < x; j++) {
         boardData[i][j].mine = positions.some((p) =>
           positionMatch(p, { x: i, y: j })
         );
@@ -136,13 +163,75 @@ export class Controller {
     }
   }
 
+  useSkill(tile, skill) {
+    // if (this.model.getSkill(skill) < 1) return;
+    const { x, y } = this.model.getBoardConfig("board-sizes");
+    const boardData = this.model.getBoardConfig("board-data");
+    switch (skill) {
+      case "scan":
+        if (tile.mine) tile.status = TILE_STATUSES.MINE;
+        else {
+          tile.status = TILE_STATUSES.NUMBER;
+          const adjacentTiles = this.nearbyTiles(tile);
+          const mines = adjacentTiles.filter((t) => t.mine);
+          tile.element.textContent = mines.length ? mines.length : "";
+          tile.element.style.color = TILE_COLORS[mines.length];
+        }
+        setTimeout(() => {
+          tile.status = TILE_STATUSES.HIDDEN;
+          tile.element.textContent = "";
+        }, 1000);
+        break;
+      case "probe":
+        if (tile.mine) {
+          tile.status = TILE_STATUSES.MINE;
+          this.model.minesScore -= 1;
+        }
+        break;
+      case "explode":
+        loop: for (let i = 0; i < y; i++) {
+          for (let j = 0; j < x; j++) {
+            if (boardData[i][j].mine) {
+              boardData[i][j].status = TILE_STATUSES.MINE;
+              this.model.minesScore -= 1;
+              break loop;
+            }
+          }
+        }
+        break;
+      case "show-wrong":
+        loop: for (let i = 0; i < y; i++) {
+          for (let j = 0; j < x; j++) {
+            if (
+              boardData[i][j].status === TILE_STATUSES.MARKED &&
+              !boardData[i][j].mine
+            ) {
+              boardData[i][j].status = TILE_STATUSES.HIDDEN;
+              this.model.minesScore += 1;
+              break loop;
+            }
+          }
+        }
+        break;
+    }
+    this.model.removeSkill(skill);
+  }
+
   revealTile(tile) {
     if (tile.status !== TILE_STATUSES.HIDDEN) {
       return;
     }
 
-    if (tile.mine) {
+    if (this.model.selectedSkill !== "none") {
+      this.useSkill(tile, this.model.selectedSkill);
+      this.model.resetSelectedSkill();
+      return;
+    }
+
+    if (tile.mine && tile.status !== TILE_STATUSES.MINE) {
       tile.status = TILE_STATUSES.MINE;
+      if (this.model.getGameConfig("game-status") !== "lose")
+        this.model.removeSkill("heal-points");
       return;
     }
 
@@ -151,22 +240,10 @@ export class Controller {
       this.model.setGameConfig("game-status", "started");
     }
 
-    if (this.model.selectedSkill !== "none") {
-      switch (this.model.selectedSkill) {
-        case "scan":
-          break;
-        case "probe":
-          break;
-        case "explode":
-          break;
-        case "show-wrong":
-          break;
-      }
-    }
-
     tile.status = TILE_STATUSES.NUMBER;
     const adjacentTiles = this.nearbyTiles(tile);
     const mines = adjacentTiles.filter((t) => t.mine);
+
     if (mines.length === 0) {
       adjacentTiles.forEach((tile) => this.revealTile(tile));
     } else {
@@ -181,6 +258,9 @@ export class Controller {
         return (
           tile.status === TILE_STATUSES.NUMBER ||
           (tile.mine && tile.status === TILE_STATUSES.MARKED) ||
+          (tile.mine &&
+            tile.status === TILE_STATUSES.MINE &&
+            this.model.getSkill("heal-points") !== 0) ||
           (!tile.mine && tile.status === TILE_STATUSES.HIDDEN)
         );
       });
@@ -190,7 +270,10 @@ export class Controller {
   checkLose() {
     return this.model.getBoardConfig("board-data").some((row) => {
       return row.some((tile) => {
-        return tile.status === TILE_STATUSES.MINE;
+        return (
+          tile.status === TILE_STATUSES.MINE &&
+          this.model.getSkill("heal-points") === 0
+        );
       });
     });
   }
@@ -201,12 +284,10 @@ export class Controller {
     const lose = this.checkLose();
 
     if (win) {
-      // console.info("Win");
-      this.model.chooseSkill();
       this.model.gameOver("win");
+      this.model.chooseSkill();
     }
     if (lose) {
-      // console.info("lose");
       this.model.gameOver("lose");
       this.model.getBoardConfig("board-data").forEach((row) => {
         row.forEach((tile) => {

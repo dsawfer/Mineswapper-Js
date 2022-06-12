@@ -10,6 +10,7 @@ export const TILE_STATUSES = {
   MINE: "mine",
   NUMBER: "number",
   MARKED: "marked",
+  OPENED: "opened",
 };
 
 export const SKILL_NAMES = [

@@ -1,29 +1,29 @@
 import { GAME_LEVELS, NUMBER_OF_SKILLS } from "../helpers/constants.js";
 
 class User {
-  constructor(view) {
+  constructor(view, model) {
     this._view = view;
+    this.model = model;
     this.skills = new Map();
 
-    this.skills.set("scan", 1);
-    this.skills.set("probe", 0);
-    this.skills.set("heal-points", 1);
-    this.skills.set("explode", 0);
-    this.skills.set("show-wrong", 0);
+    this.resetSkills();
 
     this._selectedSkill = "none";
 
-    this.skillsElement = document.querySelector(".skills");
-    this.skillsElement.onclick = (event) => {
-      if (event.target.classList.contains("highlight")) {
-        this.addSkill(event.target.id);
-        this._view.removeHighlight();
-      } else {
-        if (event.target.id === "heal-points") return;
-        this._selectedSkill = event.target.id;
-        this._view.selectSkill(event.target.id);
-      }
-    };
+    // this.skillsElement = document.querySelector(".skills");
+    // this.skillsElement.onclick = (event) => {
+    //   if (event.target.classList.contains("highlight")) {
+    //     this.addSkill(event.target.id);
+    //     this._view.removeHighlight();
+    //   } else {
+    //     if (
+    //       event.target.id === "heal-points" ||
+    //       this.skills.get(event.target.id) < 1
+    //     )
+    //       return;
+    //     this.selectSkill(event.target.id);
+    //   }
+    // };
   }
 
   get selectedSkill() {
@@ -34,25 +34,38 @@ class User {
     return (this._selectedSkill = skill);
   }
 
-  addSkill(key) {
-    this.skills.set(key, this.skills.get(key) + 1);
-    let skillElement = document.querySelector(`.${key}`);
-    let amountNumberElement = skillElement.querySelector(".amount-number");
-    amountNumberElement.textContent = this.skills.get(key);
+  selectSkill(skill) {
+    if (this.model.getGameConfig("game-status") !== "started") return;
+    this._selectedSkill = skill;
+    this._view.selectSkill(skill);
   }
 
-  removeSkill(key) {
-    this.skills.set(key, this.skills.get(key) - 1);
-    let skillElement = document.querySelector(`.${key}`);
-    let amountNumberElement = skillElement.querySelector(".amount-number");
-    amountNumberElement.textContent = this.skills.get(key);
+  addSkill(skill) {
+    this.skills.set(skill, this.skills.get(skill) + 1);
+    this._view.setSkillAmount(skill, this.skills.get(skill));
+  }
+
+  removeSkill(skill) {
+    this.skills.set(skill, this.skills.get(skill) - 1);
+    this._view.setSkillAmount(skill, this.skills.get(skill));
+    this._view.unselectSkill(skill);
+  }
+
+  resetSkills() {
+    this.skills.set("scan", 1);
+    this.skills.set("probe", 0);
+    this.skills.set("heal-points", 1);
+    this.skills.set("explode", 1);
+    this.skills.set("show-wrong", 1);
+
+    this._view.resetSkills(this.skills);
   }
 }
 
 export class Model {
   constructor(view) {
     this._view = view;
-    this._user = new User(view);
+    this._user = new User(view, this);
 
     this._board = [];
     this._minesScore = 0;
@@ -61,6 +74,40 @@ export class Model {
 
     this._currentLevel = 0;
     this._gameStatus = "not-started"; // not-started, started, win, lose, ended
+  }
+
+  get minesScore() {
+    return this._minesScore;
+  }
+
+  set minesScore(score) {
+    this._minesScore = score;
+    this._view.minesScoreView = score;
+  }
+
+  get currentLevel() {
+    return this._currentLevel;
+  }
+
+  set currentLevel(currentLevel) {
+    this._currentLevel = currentLevel;
+  }
+
+  get selectedSkill() {
+    return this._user.selectedSkill;
+  }
+
+  addSkill(skill) {
+    this._user.addSkill(skill);
+    this._view.removeHighlight();
+  }
+
+  selectSkill(skill) {
+    this._user.selectSkill(skill);
+  }
+
+  resetSelectedSkill() {
+    this._user.selectedSkill = "none";
   }
 
   getBoardConfig(selector) {
@@ -106,29 +153,16 @@ export class Model {
     }
   }
 
-  get minesScore() {
-    return this._minesScore;
+  getSkill(skill) {
+    return this._user.skills.get(skill);
   }
 
-  set minesScore(score) {
-    this._minesScore = score;
-    this._view.minesScoreView = score;
+  removeSkill(skill) {
+    this._user.removeSkill(skill);
   }
 
-  get currentLevel() {
-    return this._currentLevel;
-  }
-
-  set currentLevel(currentLevel) {
-    this._currentLevel = currentLevel;
-  }
-
-  get selectedSkill() {
-    return this._user.selectedSkill;
-  }
-
-  resetSelectedSkill() {
-    this._user.selectedSkill = "none";
+  resetSkills() {
+    this._user.resetSkills();
   }
 
   gameOver(status) {
@@ -136,7 +170,7 @@ export class Model {
       this._gameStatus = "ended";
     } else this._gameStatus = status;
 
-    this._view.gameOver(status, this._board);
+    this._view.gameOver(this._gameStatus, this._board);
   }
 
   gameStart() {
@@ -146,6 +180,7 @@ export class Model {
   }
 
   chooseSkill() {
+    if (this._gameStatus !== "win") return;
     let first = -1;
     let second = -1;
     let third = -1;

@@ -11,13 +11,27 @@ class User {
     this.skills.set("explode", 0);
     this.skills.set("show-wrong", 0);
 
+    this._selectedSkill = "none";
+
     this.skillsElement = document.querySelector(".skills");
     this.skillsElement.onclick = (event) => {
       if (event.target.classList.contains("highlight")) {
         this.addSkill(event.target.id);
         this._view.removeHighlight();
+      } else {
+        if (event.target.id === "heal-points") return;
+        this._selectedSkill = event.target.id;
+        this._view.selectSkill(event.target.id);
       }
     };
+  }
+
+  get selectedSkill() {
+    return this._selectedSkill;
+  }
+
+  set selectedSkill(skill) {
+    return (this._selectedSkill = skill);
   }
 
   addSkill(key) {
@@ -49,25 +63,47 @@ export class Model {
     this._gameStatus = "not-started"; // not-started, started, win, lose, ended
   }
 
-  get boardData() {
-    return this._board;
+  getBoardConfig(selector) {
+    switch (selector) {
+      case "board-data":
+        return this._board;
+      case "board-sizes":
+        return {
+          x: this._sizeX,
+          y: this._sizeY,
+        };
+    }
   }
 
-  set boardData(config) {
-    this._board = config.board;
-    this._view.drawBoard(config);
+  setBoardConfig(selector, value) {
+    switch (selector) {
+      case "board-data":
+        this._board = value.board;
+        this._view.drawBoard(value);
+        break;
+      case "board-sizes":
+        const { x, y } = value;
+        this._sizeX = x;
+        this._sizeY = y;
+        break;
+    }
   }
 
-  get boardSizes() {
-    return {
-      x: this._sizeX,
-      y: this._sizeY,
-    };
+  getGameConfig(selector) {
+    switch (selector) {
+      case "current-level-config":
+        return GAME_LEVELS[this._currentLevel];
+      case "game-status":
+        return this._gameStatus;
+    }
   }
 
-  set boardSizes({ x, y }) {
-    this._sizeX = x;
-    this._sizeY = y;
+  setGameConfig(selector, value) {
+    switch (selector) {
+      case "game-status":
+        this._gameStatus = value;
+        break;
+    }
   }
 
   get minesScore() {
@@ -87,16 +123,12 @@ export class Model {
     this._currentLevel = currentLevel;
   }
 
-  get currentLevelConfig() {
-    return GAME_LEVELS[this._currentLevel];
+  get selectedSkill() {
+    return this._user.selectedSkill;
   }
 
-  get gameStatus() {
-    return this._gameStatus;
-  }
-
-  set gameStatus(status) {
-    this._gameStatus = status;
+  resetSelectedSkill() {
+    this._user.selectedSkill = "none";
   }
 
   gameOver(status) {
@@ -109,6 +141,7 @@ export class Model {
 
   gameStart() {
     this._gameStatus = "not-started";
+    this._view.removeHighlight();
     this._view.gameStart();
   }
 

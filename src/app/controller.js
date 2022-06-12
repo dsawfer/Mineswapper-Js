@@ -19,14 +19,14 @@ export class Controller {
     this.newGameButton.addEventListener("click", () => {
       this.newGameButton.textContent = "New Game";
 
-      if (this.model.gameStatus === "win") {
+      if (this.model.getGameConfig("game-status") === "win") {
         this.model.currentLevel += 1;
       } else {
         this.model.currentLevel = 0;
       }
 
       this.model.gameStart();
-      this.generateBoard(this.model.currentLevelConfig);
+      this.generateBoard(this.model.getGameConfig("current-level-config"));
     });
   }
 
@@ -60,35 +60,38 @@ export class Controller {
       board.push(row);
     }
 
-    this.model.boardData = {
+    this.model.setBoardConfig("board-data", {
       board: board,
       controller: this,
       boardSizeX: x,
       boardSizeY: y,
-    };
+    });
 
-    this.model.boardSizes = { x, y };
+    this.model.setBoardConfig("board-sizes", { x, y });
     this.model.minesScore = bombsCount;
   }
 
   fillBoard(positions) {
-    for (let i = 0; i < this.model.boardSizes.x; i++) {
-      for (let j = 0; j < this.model.boardSizes.y; j++) {
-        this.model.boardData[i][j].mine = positions.some((p) =>
+    const { x, y } = this.model.getBoardConfig("board-sizes");
+    const boardData = this.model.getBoardConfig("board-data");
+    for (let i = 0; i < x; i++) {
+      for (let j = 0; j < y; j++) {
+        boardData[i][j].mine = positions.some((p) =>
           positionMatch(p, { x: i, y: j })
         );
       }
     }
-    console.info(this.model.boardData);
+    console.info(boardData);
   }
 
   generateMines(startTile) {
     const positions = [];
+    const { x, y } = this.model.getBoardConfig("board-sizes");
 
     while (positions.length < bombsCount) {
       const position = {
-        x: randomNumber(this.model.boardSizes.x),
-        y: randomNumber(this.model.boardSizes.y),
+        x: randomNumber(x),
+        y: randomNumber(y),
       };
 
       if (
@@ -104,10 +107,11 @@ export class Controller {
 
   nearbyTiles({ x, y }) {
     const tiles = [];
+    const boardData = this.model.getBoardConfig("board-data");
 
     for (let xOffset = -1; xOffset <= 1; xOffset++) {
       for (let yOffset = -1; yOffset <= 1; yOffset++) {
-        const tile = this.model.boardData[x + xOffset]?.[y + yOffset];
+        const tile = boardData[x + xOffset]?.[y + yOffset];
         if (tile) tiles.push(tile);
       }
     }
@@ -142,9 +146,22 @@ export class Controller {
       return;
     }
 
-    if (this.model.gameStatus === "not-started") {
+    if (this.model.getGameConfig("game-status") === "not-started") {
       this.generateMines(tile);
-      this.model.gameStatus = "started";
+      this.model.setGameConfig("game-status", "started");
+    }
+
+    if (this.model.selectedSkill !== "none") {
+      switch (this.model.selectedSkill) {
+        case "scan":
+          break;
+        case "probe":
+          break;
+        case "explode":
+          break;
+        case "show-wrong":
+          break;
+      }
     }
 
     tile.status = TILE_STATUSES.NUMBER;
@@ -159,7 +176,7 @@ export class Controller {
   }
 
   checkWin() {
-    return this.model.boardData.every((row) => {
+    return this.model.getBoardConfig("board-data").every((row) => {
       return row.every((tile) => {
         return (
           tile.status === TILE_STATUSES.NUMBER ||
@@ -171,7 +188,7 @@ export class Controller {
   }
 
   checkLose() {
-    return this.model.boardData.some((row) => {
+    return this.model.getBoardConfig("board-data").some((row) => {
       return row.some((tile) => {
         return tile.status === TILE_STATUSES.MINE;
       });
@@ -179,7 +196,7 @@ export class Controller {
   }
 
   checkGameEnd() {
-    if (this.model.gameStatus === "not-started") return;
+    if (this.model.getGameConfig("game-status") === "not-started") return;
     const win = this.checkWin();
     const lose = this.checkLose();
 
@@ -191,7 +208,7 @@ export class Controller {
     if (lose) {
       // console.info("lose");
       this.model.gameOver("lose");
-      this.model.boardData.forEach((row) => {
+      this.model.getBoardConfig("board-data").forEach((row) => {
         row.forEach((tile) => {
           if (tile.status === TILE_STATUSES.MARKED) this.markTile(tile);
           if (tile.mine) this.revealTile(tile);

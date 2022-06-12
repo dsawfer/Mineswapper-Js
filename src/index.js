@@ -9,4 +9,4 @@ const model = new Model(view);
 // create controller
 const controller = new Controller(model);
 
-controller.generateBoard(model.currentLevelConfig);
+controller.generateBoard(model.getGameConfig("current-level-config"));

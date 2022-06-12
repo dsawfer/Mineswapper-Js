@@ -123,4 +123,8 @@ export class View {
       skillElement.classList.remove("highlight");
     }
   }
+
+  selectSkill(skill) {
+    console.info(skill);
+  }
 }
